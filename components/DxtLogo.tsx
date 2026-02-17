@@ -14,11 +14,6 @@ export const logoPaths = {
   ],
 } as const;
 
-const strokePathStyle = {
-  strokeLinecap: "round" as const,
-  strokeLinejoin: "round" as const,
-};
-
 type DxtLogoProps = ComponentPropsWithoutRef<"svg"> & {
   TextGroup?: ElementType;
   LeftMoonGroup?: ElementType;
@@ -26,9 +21,9 @@ type DxtLogoProps = ComponentPropsWithoutRef<"svg"> & {
   textGroupProps?: Record<string, unknown>;
   leftMoonGroupProps?: Record<string, unknown>;
   rightMoonGroupProps?: Record<string, unknown>;
-  strokeDraw?: boolean;
-  strokeDrawDuration?: number;
-  strokeDrawStagger?: number;
+  showGlare?: boolean;
+  glareDelay?: number;
+  mousePos?: { x: number; y: number } | null;
 };
 
 export function DxtLogo({
@@ -38,22 +33,15 @@ export function DxtLogo({
   textGroupProps,
   leftMoonGroupProps,
   rightMoonGroupProps,
-  strokeDraw = false,
-  strokeDrawDuration = 0.6,
-  strokeDrawStagger = 0.08,
+  showGlare = false,
+  glareDelay = 1,
+  mousePos = null,
   className,
   ...svgProps
 }: DxtLogoProps) {
-  const strokeTransition = (delay: number) => ({
-    delay,
-    duration: strokeDrawDuration,
-    ease: [0.22, 1, 0.36, 1] as const,
-  });
-
   return (
     <svg
       viewBox="0 0 658 276"
-      fill="currentColor"
       role="img"
       aria-label="dxt.tsx logo"
       overflow="visible"
@@ -61,6 +49,11 @@ export function DxtLogo({
       {...svgProps}
     >
       <defs>
+        <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#d2a8ff" />
+          <stop offset="50%" stopColor="#9e7aff" />
+          <stop offset="100%" stopColor="#e06b88" />
+        </linearGradient>
         <mask id="logoMask">
           <path d={logoPaths.text} fill="white" />
           {logoPaths.moonLeft.map((path) => (
@@ -78,82 +71,84 @@ export function DxtLogo({
             />
           ))}
         </mask>
+        <linearGradient
+          id="glareGradient"
+          x1="0%"
+          y1="0%"
+          x2="100%"
+          y2="0%"
+          gradientUnits="objectBoundingBox"
+        >
+          <stop offset="0%" stopColor="transparent" />
+          <stop offset="40%" stopColor="transparent" />
+          <stop offset="50%" stopColor="rgba(255,255,255,0.6)" />
+          <stop offset="60%" stopColor="transparent" />
+          <stop offset="100%" stopColor="transparent" />
+        </linearGradient>
+        <radialGradient
+          id="spotlightGradient"
+          cx={mousePos ? `${mousePos.x * 100}%` : "50%"}
+          cy={mousePos ? `${mousePos.y * 100}%` : "50%"}
+          r="30%"
+          gradientUnits="objectBoundingBox"
+        >
+          <stop offset="0%" stopColor="rgba(210, 168, 255, 0.5)" />
+          <stop offset="70%" stopColor="transparent" />
+          <stop offset="100%" stopColor="transparent" />
+        </radialGradient>
       </defs>
-      {strokeDraw ? (
-        <>
-          <g>
-            {logoPaths.moonLeft.map((path, i) => (
-              <motion.path
-                key={`left-${path.slice(0, 30)}`}
-                d={path}
-                fill="currentColor"
-                stroke="currentColor"
-                strokeWidth={1.5}
-                pathLength={1}
-                strokeDasharray="1 1"
-                initial={{ strokeDashoffset: 1 }}
-                animate={{ strokeDashoffset: 0 }}
-                transition={strokeTransition(0.5 + i * strokeDrawStagger)}
-                style={strokePathStyle}
-              />
-            ))}
-          </g>
-          <g>
-            {logoPaths.moonRight.map((path, i) => (
-              <motion.path
-                key={`right-${path.slice(0, 30)}`}
-                d={path}
-                fill="currentColor"
-                stroke="currentColor"
-                strokeWidth={1.5}
-                pathLength={1}
-                strokeDasharray="1 1"
-                initial={{ strokeDashoffset: 1 }}
-                animate={{ strokeDashoffset: 0 }}
-                transition={strokeTransition(0.66 + i * strokeDrawStagger)}
-                style={strokePathStyle}
-              />
-            ))}
-          </g>
-          <g>
-            <motion.path
-              d={logoPaths.text}
-              fill="currentColor"
-              stroke="currentColor"
-              strokeWidth={1.5}
-              pathLength={1}
-              strokeDasharray="1 1"
-              initial={{ strokeDashoffset: 1 }}
-              animate={{ strokeDashoffset: 0 }}
-              transition={strokeTransition(0)}
-              style={strokePathStyle}
-            />
-          </g>
-        </>
-      ) : (
-        <>
-          <LeftMoonGroup {...leftMoonGroupProps}>
-            {logoPaths.moonLeft.map((path) => (
-              <path
-                key={`left-${path.slice(0, 30)}`}
-                d={path}
-                fill="currentColor"
-              />
-            ))}
-          </LeftMoonGroup>
-          <RightMoonGroup {...rightMoonGroupProps}>
-            {logoPaths.moonRight.map((path) => (
-              <path
-                key={`right-${path.slice(0, 30)}`}
-                d={path}
-                fill="currentColor"
-              />
-            ))}
-          </RightMoonGroup>
-          <TextGroup {...textGroupProps}>
-            <path d={logoPaths.text} fill="currentColor" />
-          </TextGroup>
-        </>
+      <LeftMoonGroup {...leftMoonGroupProps}>
+        {logoPaths.moonLeft.map((path) => (
+          <path
+            key={`left-${path.slice(0, 30)}`}
+            d={path}
+            fill="url(#logoGradient)"
+          />
+        ))}
+      </LeftMoonGroup>
+      <RightMoonGroup {...rightMoonGroupProps}>
+        {logoPaths.moonRight.map((path) => (
+          <path
+            key={`right-${path.slice(0, 30)}`}
+            d={path}
+            fill="url(#logoGradient)"
+          />
+        ))}
+      </RightMoonGroup>
+      <TextGroup {...textGroupProps}>
+        <path d={logoPaths.text} fill="url(#logoGradient)" />
+      </TextGroup>
+
+      {/* Glare — white sweep, masked to logo paths only */}
+      {showGlare && (
+        <motion.rect
+          x={-150}
+          y={-10}
+          width={200}
+          height={300}
+          fill="url(#glareGradient)"
+          mask="url(#logoMask)"
+          initial={{ x: -150 }}
+          animate={{ x: 608 }}
+          transition={{
+            delay: glareDelay,
+            duration: 0.5,
+            ease: "easeOut",
+          }}
+          style={{ transformOrigin: "center center" }}
+        />
+      )}
+
+      {/* Cursor spotlight — radial highlight, masked to logo paths only */}
+      {mousePos && (
+        <rect
+          x={0}
+          y={0}
+          width={658}
+          height={276}
+          fill="url(#spotlightGradient)"
+          mask="url(#logoMask)"
+        />
       )}
     </svg>
   );

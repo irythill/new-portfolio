@@ -5,11 +5,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { DxtLogo } from "./DxtLogo";
 
-const moonGroupTransition = {
-  delay: 0.8,
-  duration: 0.3,
-  ease: [0.22, 1, 0.36, 1] as const,
-};
+// Fill reveal: text first (0), left moons (0.3), right moons (0.5) — total ~0.8s
 
 export function Hero() {
   const logoRef = useRef<HTMLDivElement>(null);
@@ -73,84 +69,42 @@ export function Hero() {
             className="relative inline-block"
           >
             <DxtLogo
-              className="h-full min-h-[35vh] w-auto max-w-full text-foreground md:min-h-[45vh] lg:min-h-[50vh]"
-              strokeDraw={!prefersReducedMotion}
-              strokeDrawDuration={0.6}
-              strokeDrawStagger={0.08}
+              className="h-full min-h-[35vh] w-auto max-w-full md:min-h-[45vh] lg:min-h-[50vh]"
               TextGroup={motion.g}
               LeftMoonGroup={motion.g}
               RightMoonGroup={motion.g}
               textGroupProps={{
                 initial: { opacity: 0 },
                 animate: { opacity: 1 },
-                transition: { delay: 0, duration: 0.5, ease: "easeOut" },
+                transition: prefersReducedMotion
+                  ? { duration: 0.2 }
+                  : { delay: 0, duration: 0.4, ease: "easeOut" },
               }}
               leftMoonGroupProps={{
-                initial: { opacity: 0, scale: 0.95 },
-                animate: { opacity: 1, scale: 1 },
-                transition: moonGroupTransition,
-                style: { transformOrigin: "center center" },
+                initial: { opacity: 0 },
+                animate: { opacity: 1 },
+                transition: prefersReducedMotion
+                  ? { duration: 0.2 }
+                  : { delay: 0.3, duration: 0.4, ease: [0.22, 1, 0.36, 1] },
               }}
               rightMoonGroupProps={{
-                initial: { opacity: 0, scale: 0.95 },
-                animate: { opacity: 1, scale: 1 },
-                transition: moonGroupTransition,
-                style: { transformOrigin: "center center" },
+                initial: { opacity: 0 },
+                animate: { opacity: 1 },
+                transition: prefersReducedMotion
+                  ? { duration: 0.2 }
+                  : { delay: 0.5, duration: 0.4, ease: [0.22, 1, 0.36, 1] },
               }}
+              showGlare={!prefersReducedMotion}
+              glareDelay={1}
+              mousePos={mousePos}
             />
-
-            {/* Entrance shine — sweeps left-to-right, masked to logo shapes only */}
-            {!prefersReducedMotion && (
-              <motion.div
-                aria-hidden
-                className="pointer-events-none absolute inset-0"
-                initial={{ x: "-100%" }}
-                animate={{ x: "100%" }}
-                transition={{
-                  delay: 1.5,
-                  duration: 0.5,
-                  ease: "easeOut",
-                }}
-                style={{
-                  background:
-                    "linear-gradient(90deg, transparent, rgba(210, 168, 255, 0.35), transparent)",
-                  mask: "url(#logoMask)",
-                  WebkitMaskImage: "url(#logoMask)",
-                  maskSize: "100% 100%",
-                  WebkitMaskSize: "100% 100%",
-                  maskRepeat: "no-repeat",
-                  WebkitMaskRepeat: "no-repeat",
-                  maskPosition: "center",
-                  WebkitMaskPosition: "center",
-                }}
-              />
-            )}
-
-            {/* Cursor-following spotlight on hover — masked to logo shapes only */}
-            {mousePos && (
-              <div
-                aria-hidden
-                className="pointer-events-none absolute inset-0"
-                style={{
-                  background: `radial-gradient(circle 120px at ${mousePos.x * 100}% ${mousePos.y * 100}%, rgba(210, 168, 255, 0.18), transparent 70%)`,
-                  mask: "url(#logoMask)",
-                  WebkitMaskImage: "url(#logoMask)",
-                  maskSize: "100% 100%",
-                  WebkitMaskSize: "100% 100%",
-                  maskRepeat: "no-repeat",
-                  WebkitMaskRepeat: "no-repeat",
-                  maskPosition: "center",
-                  WebkitMaskPosition: "center",
-                }}
-              />
-            )}
           </div>
         </motion.div>
 
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 1.8, duration: 0.6 }}
+          transition={{ delay: 1.5, duration: 0.6 }}
           className="mt-4 font-[family-name:var(--font-share-tech-mono)] text-lg text-accent md:text-xl"
         >
           Front-end Developer & IT Student
@@ -158,7 +112,7 @@ export function Hero() {
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 1.9, duration: 0.6 }}
+          transition={{ delay: 1.6, duration: 0.6 }}
           className="mt-2 font-[family-name:var(--font-exo2)] text-base text-foreground/70"
         >
           Henrique Souza
@@ -166,7 +120,7 @@ export function Hero() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 2, duration: 0.5 }}
+          transition={{ delay: 1.7, duration: 0.5 }}
           className="mt-10 flex flex-wrap justify-center gap-4"
         >
           <Link
