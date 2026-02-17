@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { DxtLogo } from "./DxtLogo";
 
-// Fill reveal: text first (0), left moons (0.3), right moons (0.5) — total ~0.8s
+// Expand: moons fade in + expand apart (0–0.9s), text typing (0.9–1.4s), rest (1.7+)
 
 export function Hero() {
   const logoRef = useRef<HTMLDivElement>(null);
@@ -73,30 +73,108 @@ export function Hero() {
               TextGroup={motion.g}
               LeftMoonGroup={motion.g}
               RightMoonGroup={motion.g}
-              textGroupProps={{
-                initial: { opacity: 0 },
-                animate: { opacity: 1 },
-                transition: prefersReducedMotion
-                  ? { duration: 0.2 }
-                  : { delay: 0, duration: 0.4, ease: "easeOut" },
-              }}
-              leftMoonGroupProps={{
-                initial: { opacity: 0 },
-                animate: { opacity: 1 },
-                transition: prefersReducedMotion
-                  ? { duration: 0.2 }
-                  : { delay: 0.3, duration: 0.4, ease: [0.22, 1, 0.36, 1] },
-              }}
-              rightMoonGroupProps={{
-                initial: { opacity: 0 },
-                animate: { opacity: 1 },
-                transition: prefersReducedMotion
-                  ? { duration: 0.2 }
-                  : { delay: 0.5, duration: 0.4, ease: [0.22, 1, 0.36, 1] },
-              }}
+              textGroupProps={
+                prefersReducedMotion
+                  ? {
+                      initial: { opacity: 0 },
+                      animate: { opacity: 1 },
+                      transition: { duration: 0.2 },
+                    }
+                  : {
+                      initial: { opacity: 0 },
+                      animate: { opacity: 1 },
+                      transition: {
+                        delay: 0,
+                        duration: 0.4,
+                        ease: "easeOut",
+                      },
+                    }
+              }
+              leftMoonGroupProps={
+                prefersReducedMotion
+                  ? {
+                      initial: { opacity: 0 },
+                      animate: { opacity: 1 },
+                      transition: { duration: 0.2 },
+                    }
+                  : {
+                      initial: {
+                        opacity: 0,
+                        x: 305,
+                        scale: 0.35,
+                      },
+                      animate: {
+                        opacity: 1,
+                        x: 0,
+                        scale: 1,
+                      },
+                      transition: {
+                        opacity: {
+                          delay: 0,
+                          duration: 0.6,
+                          ease: [0.25, 0.1, 0.25, 1],
+                        },
+                        x: {
+                          delay: 0.6,
+                          duration: 1.2,
+                          ease: [0.25, 0.1, 0.25, 1],
+                        },
+                        scale: {
+                          delay: 0.6,
+                          duration: 1.2,
+                          ease: [0.25, 0.1, 0.25, 1],
+                        },
+                      },
+                      style: {
+                        transformOrigin: "16px 138px",
+                      },
+                    }
+              }
+              rightMoonGroupProps={
+                prefersReducedMotion
+                  ? {
+                      initial: { opacity: 0 },
+                      animate: { opacity: 1 },
+                      transition: { duration: 0.2 },
+                    }
+                  : {
+                      initial: {
+                        opacity: 0,
+                        x: -305,
+                        scale: 0.35,
+                      },
+                      animate: {
+                        opacity: 1,
+                        x: 0,
+                        scale: 1,
+                      },
+                      transition: {
+                        opacity: {
+                          delay: 0,
+                          duration: 0.6,
+                          ease: [0.25, 0.1, 0.25, 1],
+                        },
+                        x: {
+                          delay: 0.6,
+                          duration: 1.2,
+                          ease: [0.25, 0.1, 0.25, 1],
+                        },
+                        scale: {
+                          delay: 0.6,
+                          duration: 1.2,
+                          ease: [0.25, 0.1, 0.25, 1],
+                        },
+                      },
+                      style: {
+                        transformOrigin: "590px 138px",
+                      },
+                    }
+              }
               showGlare={!prefersReducedMotion}
-              glareDelay={1}
+              glareDelay={1.8}
               mousePos={mousePos}
+              animationMode="expand"
+              prefersReducedMotion={prefersReducedMotion}
             />
           </div>
         </motion.div>
@@ -104,7 +182,11 @@ export function Hero() {
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 1.5, duration: 0.6 }}
+          transition={{
+            delay: 2.6,
+            duration: 0.8,
+            ease: [0.25, 0.1, 0.25, 1],
+          }}
           className="mt-4 font-[family-name:var(--font-share-tech-mono)] text-lg text-accent md:text-xl"
         >
           Front-end Developer & IT Student
@@ -112,7 +194,11 @@ export function Hero() {
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 1.6, duration: 0.6 }}
+          transition={{
+            delay: 2.9,
+            duration: 0.8,
+            ease: [0.25, 0.1, 0.25, 1],
+          }}
           className="mt-2 font-[family-name:var(--font-exo2)] text-base text-foreground/70"
         >
           Henrique Souza
@@ -120,7 +206,11 @@ export function Hero() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.7, duration: 0.5 }}
+          transition={{
+            delay: 3.2,
+            duration: 0.7,
+            ease: [0.25, 0.1, 0.25, 1],
+          }}
           className="mt-10 flex flex-wrap justify-center gap-4"
         >
           <Link
